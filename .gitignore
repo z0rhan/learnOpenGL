@@ -1,0 +1,10 @@
+# build
+cmake-build-debug/
+
+# clang
+.cache/
+compile_commands.json
+
+# Clion
+.idea/
+
