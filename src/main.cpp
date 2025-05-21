@@ -87,6 +87,8 @@ int main() {
 
         shader.setUniform4f("u_color", 1.0f, 0.0f, 0.0f, 1.0f);
 
+        EBO.bind();
+
         while (!glfwWindowShouldClose(window))
         {
             // Handle Input
