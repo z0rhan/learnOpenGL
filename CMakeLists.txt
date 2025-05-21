@@ -9,7 +9,12 @@ find_package(OpenGL REQUIRED)
 
 set(SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_SOURCE_DIR}/src/shader.cpp
+    ${CMAKE_SOURCE_DIR}/src/Shader.cpp
+    ${CMAKE_SOURCE_DIR}/src/Renderer.cpp
+    ${CMAKE_SOURCE_DIR}/src/VertexBuffer.cpp
+    ${CMAKE_SOURCE_DIR}/src/IndexBuffer.cpp
+    ${CMAKE_SOURCE_DIR}/src/VertexArray.cpp
+    ${CMAKE_SOURCE_DIR}/src/VertexBufferLayout.cpp
     ${CMAKE_SOURCE_DIR}/glad/src/glad.c
 )
 

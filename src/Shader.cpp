@@ -1,14 +1,84 @@
-#include "shader.hh"
+#include "Shader.hh"
+#include "Renderer.hh"
+
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <stdexcept>
+
 
 //------------------------------------------------------------------------------
 // Public
+Shader::Shader(const std::string& filePath):
+    m_filePath(filePath),
+    m_renderedId(0)
+{
+    ShaderSource source;
+    try
+    {
+        source = parseShader(filePath);
+    }
+    catch (const std::runtime_error& e)
+    {
+        std::cerr << e.what() << std::endl;
+        return;
+    }
 
-Shader::ShaderSource Shader::parseShader(const std::string& filePath) {
+    m_renderedId = createShader(source.vertexSource, source.fragmentSource);
+}
+
+Shader::~Shader()
+{
+    glCall(glDeleteProgram(m_renderedId));
+}
+
+void Shader::bind() const
+{
+    glCall(glUseProgram(m_renderedId));
+}
+
+void Shader::unbind() const
+{
+    glCall(glUseProgram(0));
+}
+
+void Shader::setUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
+{
+    glCall(glUniform4f(getUniformLocation(name), v0, v1, v2, v3));
+}
+
+int Shader::getUniformLocation(const std::string& name)
+{
+    if (m_uniformLocationCache.find(name) != m_uniformLocationCache.end())
+    {
+        return m_uniformLocationCache.at(name);
+    }
+
+    glCall(int location = glGetUniformLocation(m_renderedId, name.c_str()));
+
+    if (location == -1)
+    {
+        std::cout << "Uniform [" << name << "] does not exist!" << std::endl;
+    }
+
+    return location;
+}
+
+bool Shader::isValid() const
+{
+    return m_renderedId != 0;
+}
+
+//------------------------------------------------------------------------------
+// Private
+ShaderSource Shader::parseShader(const std::string& filePath)
+{
     ShaderType currentType = ShaderType::NONE;
     std::stringstream shaderSource[2];
 
     std::ifstream fileObj(filePath);
-    if (!fileObj) {
+    if (!fileObj)
+    {
         throw std::runtime_error("Error reading from file! -> "
                                  + filePath);
     }
@@ -55,20 +125,7 @@ unsigned int Shader::compileShader(unsigned int type, const std::string &source)
     unsigned int shader = glCreateShader(type);
     const char* shaderSource = source.c_str();
     glShaderSource(shader, 1, &shaderSource, nullptr);
-    glCompileShader(shader);
-
-    int success;
-    char infoLog[512];
-
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-    if (!success)
-    {
-        glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-        glDeleteShader(shader);
-        throw std::runtime_error(std::string("Shader Compilation failed!!!\n")
-                                             + infoLog);
-    }
+    glCall(glCompileShader(shader));
 
     return shader;
 }
