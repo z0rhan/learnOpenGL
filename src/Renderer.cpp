@@ -1,31 +1,10 @@
 #include "Renderer.hh"
 
-#include <iostream>
-
-
-void glClearError()
+void Renderer::draw(const VertexArray& VAO, const IndexBuffer& EBO, const Shader& shader)
 {
-    while (glGetError() != GL_NO_ERROR); // while (glGetError()) is enough
+    VAO.bind();
+    EBO.bind();
+    shader.bind();
+
+    glCall(glDrawElements(GL_TRIANGLES, EBO.getCount(), GL_UNSIGNED_INT, nullptr));
 }
-
-bool glLogError(const char* function, const char* file, int line)
-{
-    while (GLenum error = glGetError())
-    {
-        std::cout << "OpenGL Error [" 
-                  << error 
-                  << "] : " 
-                  << function
-                  << " : "
-                  << file
-                  <<" : "
-                  << line
-                  << std::endl;
-
-        return false;
-    }
-
-    return true;
-}
-
-

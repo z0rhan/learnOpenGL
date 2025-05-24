@@ -1,5 +1,5 @@
 #include "IndexBuffer.hh"
-#include "Renderer.hh"
+#include "error.hh"
 
 
 IndexBuffer::IndexBuffer(const unsigned int* data, unsigned int count)

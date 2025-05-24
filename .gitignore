@@ -8,3 +8,5 @@ compile_commands.json
 # Clion
 .idea/
 
+# Formatter
+.clang-format
