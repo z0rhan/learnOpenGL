@@ -10,7 +10,7 @@
  *   offset is where each attribute starts
  */
 
-#include "Renderer.hh"
+#include "error.hh"
 
 #include <glad/glad.h>
 #include <vector>

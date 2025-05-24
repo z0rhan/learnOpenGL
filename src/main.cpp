@@ -3,12 +3,14 @@
 #include "VertexBuffer.hh"
 #include "IndexBuffer.hh"
 #include "VertexArray.hh"
+#include "Texture.hh"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-const std::string shaderFilePath = "res/shaders/basic.shader";
+const std::string c_shaderFilePath = "res/shaders/basic.shader";
+const std::string c_textureFilePath = "res/textures/container.jpg";
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -33,7 +35,6 @@ int main() {
         return EXIT_FAILURE;
     }
 
-
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -45,24 +46,23 @@ int main() {
     glViewport(0, 0, 800, 600);
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
+    Renderer renderer;
+
     // Make shader object
-    Shader shader(shaderFilePath);
+    Shader shader(c_shaderFilePath);
     if (!shader.isValid())
     {
         std::cerr << "Something went wrong while initializing the shader!" << std::endl;
         return EXIT_FAILURE;
     }
 
-    // Use the shaderProgram
-    shader.bind();
-
     {
         float positions[] =
         {
-            -0.5f, -0.5f, 0.0f,
-            -0.5f,  0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-             0.5f,  0.5f, 0.0f,
+            -0.5f, -0.5f, 0.0f, 0.0f,
+            -0.5f,  0.5f, 0.0f, 1.0f,
+             0.5f, -0.5f, 1.0f, 0.0f,
+             0.5f,  0.5f, 1.0f, 1.0f,
         };
 
         unsigned int indices[] =
@@ -81,13 +81,16 @@ int main() {
         IndexBuffer EBO(indices, 6);
 
         VertexBufferLayout layout;
-        layout.push<float>(3); // add the positions layout
+        layout.push<float>(2); // add the positions layout
+        layout.push<float>(2); // add the texture layout
         // layout.push<float>(3) -> say we decide to add colors too
         VAO.addBuffer(VBO, layout); // this does -> VAO.bind() & VBO.bind()
 
-        shader.setUniform4f("u_color", 1.0f, 0.0f, 0.0f, 1.0f);
+        shader.bind();
 
-        EBO.bind();
+        Texture texture(c_textureFilePath);
+        texture.bind();
+        shader.setUniform1i("u_texture", 0);
 
         while (!glfwWindowShouldClose(window))
         {
@@ -98,7 +101,7 @@ int main() {
             glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            glCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+            renderer.draw(VAO, EBO, shader);
 
             // Swap Buffer
             glfwSwapBuffers(window);

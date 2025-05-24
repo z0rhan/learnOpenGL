@@ -26,10 +26,7 @@
  * The destructor does the above call
  */
 
-#include "Renderer.hh"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <string>
 #include <unordered_map>
 
@@ -55,6 +52,7 @@ public:
     void unbind() const;
 
     void setUniform4f(const std::string& name, float v0, float v1, float v2, float v3);
+    void setUniform1i(const std::string& name, int value);
 
     bool isValid() const;
 
@@ -65,7 +63,7 @@ private:
 
     static ShaderSource parseShader(const std::string& filePath);    
     static unsigned int createShader(const std::string& vertexSource,
-                                     const std::string& fragmanetSource);
+                                     const std::string& fragmentSource);
     static unsigned int compileShader(unsigned int type,const std::string& source);
     int getUniformLocation(const std::string& name);
 };
