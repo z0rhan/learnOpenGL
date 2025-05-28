@@ -21,6 +21,7 @@ set(SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/glad/src/glad.c
 )
 
+
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -30,6 +31,26 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME}
+        OpenGL::GL
+        ${CMAKE_SOURCE_DIR}/lib/libglfw3.a
+)
+
+# Tests
+set(TEST_FILES
+    ${CMAKE_SOURCE_DIR}/test/main.cpp
+    ${CMAKE_SOURCE_DIR}/glad/src/glad.c
+    ${CMAKE_SOURCE_DIR}/src/vendor/stb_image/stb_image.cpp
+)
+
+add_executable(${PROJECT_NAME}_test ${TEST_FILES})
+
+target_include_directories(${PROJECT_NAME}_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/glad/include
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/src/vendor
+)
+
+target_link_libraries(${PROJECT_NAME}_test
         OpenGL::GL
         ${CMAKE_SOURCE_DIR}/lib/libglfw3.a
 )

@@ -1,21 +1,25 @@
-#include "Shader.hh"
-#include "Renderer.hh"
-#include "VertexBuffer.hh"
 #include "IndexBuffer.hh"
-#include "VertexArray.hh"
+#include "Renderer.hh"
+#include "Shader.hh"
 #include "Texture.hh"
+#include "VertexArray.hh"
+#include "VertexBuffer.hh"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 const std::string c_shaderFilePath = "res/shaders/basic.shader";
-const std::string c_textureFilePath = "res/textures/container.jpg";
+const std::string c_textureFilePath1 = "res/textures/container.jpg";
+const std::string c_textureFilePath2 = "res/textures/awesomeface.png";
 
-void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+void framebufferSizeCallback(GLFWwindow *window, int width, int height);
+void processInput(GLFWwindow *window);
 
-int main() {
+int main()
+{
     if (!glfwInit())
     {
         std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -26,7 +30,8 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6); // OpenGL version
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Learn OpenGL", nullptr, nullptr);
+    GLFWwindow *window =
+        glfwCreateWindow(800, 600, "Learn OpenGL", nullptr, nullptr);
 
     if (window == nullptr)
     {
@@ -52,24 +57,22 @@ int main() {
     Shader shader(c_shaderFilePath);
     if (!shader.isValid())
     {
-        std::cerr << "Something went wrong while initializing the shader!" << std::endl;
+        std::cerr << "Something went wrong while initializing the shader!"
+                  << std::endl;
         return EXIT_FAILURE;
     }
 
     {
-        float positions[] =
-        {
+        float positions[] = {
             -0.5f, -0.5f, 0.0f, 0.0f,
             -0.5f,  0.5f, 0.0f, 1.0f,
              0.5f, -0.5f, 1.0f, 0.0f,
              0.5f,  0.5f, 1.0f, 1.0f,
         };
 
-        unsigned int indices[] =
-        {
-            0, 1, 2,
-            1, 2, 3
-        };
+        unsigned int indices[] = {0, 1, 2, 1, 2, 3};
+
+        glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -0.75f, 0.75f, -1.0f, 1.0f);
 
         // Vertex Array Object
         VertexArray VAO;
@@ -88,9 +91,13 @@ int main() {
 
         shader.bind();
 
-        Texture texture(c_textureFilePath);
-        texture.bind();
-        shader.setUniform1i("u_texture", 0);
+        Texture texture1(c_textureFilePath1);
+        Texture texture2(c_textureFilePath2);
+        texture1.bind();
+        texture2.bind(1);
+        shader.setUniform1i("u_texture1", 0);
+        shader.setUniform1i("u_texture2", 1);
+        shader.setUniformMat4f("u_MVP", proj);
 
         while (!glfwWindowShouldClose(window))
         {
@@ -112,7 +119,7 @@ int main() {
     return 0;
 }
 
-void framebufferSizeCallback(GLFWwindow* window, int width, int height)
+void framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
@@ -124,4 +131,3 @@ void processInput(GLFWwindow *window)
         glfwSetWindowShouldClose(window, true);
     }
 }
-
