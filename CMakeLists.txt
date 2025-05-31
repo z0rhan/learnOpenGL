@@ -17,40 +17,40 @@ set(SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/VertexBufferLayout.cpp
     ${CMAKE_SOURCE_DIR}/src/error.cpp
     ${CMAKE_SOURCE_DIR}/src/Texture.cpp
-    ${CMAKE_SOURCE_DIR}/src/vendor/stb_image/stb_image.cpp
-    ${CMAKE_SOURCE_DIR}/glad/src/glad.c
+    ${CMAKE_SOURCE_DIR}/vendor/stb_image/stb_image.cpp
+    ${CMAKE_SOURCE_DIR}/vendor/glad/src/glad.c
 )
 
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/glad/include
+    ${CMAKE_SOURCE_DIR}/vendor/glad/include
     ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/src/vendor
+    ${CMAKE_SOURCE_DIR}/vendor
 )
 
 target_link_libraries(${PROJECT_NAME}
         OpenGL::GL
-        ${CMAKE_SOURCE_DIR}/lib/libglfw3.a
+        ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a
 )
 
 # Tests
 set(TEST_FILES
-    ${CMAKE_SOURCE_DIR}/test/main.cpp
-    ${CMAKE_SOURCE_DIR}/glad/src/glad.c
-    ${CMAKE_SOURCE_DIR}/src/vendor/stb_image/stb_image.cpp
+    ${CMAKE_SOURCE_DIR}/sandbox/main.cpp
+    ${CMAKE_SOURCE_DIR}/vendor/glad/src/glad.c
+    ${CMAKE_SOURCE_DIR}/vendor/stb_image/stb_image.cpp
 )
 
 add_executable(${PROJECT_NAME}_test ${TEST_FILES})
 
 target_include_directories(${PROJECT_NAME}_test PRIVATE
-    ${CMAKE_SOURCE_DIR}/glad/include
+    ${CMAKE_SOURCE_DIR}/vendor/glad/include
     ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/src/vendor
+    ${CMAKE_SOURCE_DIR}/vendor
 )
 
 target_link_libraries(${PROJECT_NAME}_test
         OpenGL::GL
-        ${CMAKE_SOURCE_DIR}/lib/libglfw3.a
+        ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a
 )

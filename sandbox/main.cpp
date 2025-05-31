@@ -1,10 +1,10 @@
-#include "glm/trigonometric.hpp"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image/stb_image.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "glm/trigonometric.hpp"
 
 #include <iostream>
 #include <format>
@@ -44,7 +44,8 @@ const char* c_fragmentShaderSource =
 const char* c_texture1FilePath = "res/textures/container.jpg";
 const char* c_texture2FilePath = "res/textures/awesomeface.png";
 
-int main (int argc, char *argv[]) {
+int main (int argc, char *argv[])
+{
     if (!glfwInit())
     {
         std::cerr << "Failed to initialize GLFW!\n";
