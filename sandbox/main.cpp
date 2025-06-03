@@ -9,6 +9,7 @@
 #include <iostream>
 #include <format>
 #include <filesystem>
+#include <cmath>
 
 void updateWindowSize(GLFWwindow* window, int width, int height);
 
@@ -20,10 +21,12 @@ const char* c_vertexShaderSource =
 "\n"
 "out vec2 v_texCoord;\n"
 "\n"
-"uniform mat4 u_transform;\n"
+"uniform mat4 u_model;\n"
+"uniform mat4 u_view;\n"
+"uniform mat4 u_projection;\n"
 "void main()\n"
 "{\n"
-"   gl_Position = u_transform * vec4(position, 1.0);\n"
+"   gl_Position = u_projection * u_view * u_model * vec4(position, 1.0);\n"
 "   v_texCoord = texture;\n"
 "}\n";
 
@@ -43,6 +46,26 @@ const char* c_fragmentShaderSource =
 
 const char* c_texture1FilePath = "res/textures/container.jpg";
 const char* c_texture2FilePath = "res/textures/awesomeface.png";
+const unsigned int c_screenWidth = 800;
+const unsigned int c_screenHeight = 600;
+
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 6.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 yAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+float pitch = 0.0f;
+float yaw = -90.0f;
+float lastX = (float)c_screenWidth / 2;
+float lastY = (float)c_screenHeight/ 2;
+bool firstMouse = true;
+float fieldOfView = 45.0f;
+
+void processInput(GLFWwindow* window);
+void handleMouseMovement(GLFWwindow* window, double xPos, double yPos);
+void handleMouseScroll(GLFWwindow* window, double xOffset, double yOffset);
 
 int main (int argc, char *argv[])
 {
@@ -56,7 +79,7 @@ int main (int argc, char *argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "TEST", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(c_screenWidth, c_screenHeight, "TEST", nullptr, nullptr);
 
     if (!window)
     {
@@ -66,6 +89,9 @@ int main (int argc, char *argv[])
     }
 
     glfwMakeContextCurrent(window);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, handleMouseMovement);
+    glfwSetScrollCallback(window, handleMouseScroll);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -78,16 +104,67 @@ int main (int argc, char *argv[])
 
     std::cout << std::format("Wokring dir: {}\n", std::filesystem::current_path().string());
 
-    float attributes[] = {
-        -0.5f,  0.5f,  0.0f, 0.0f,  1.0f, // Top left
-         0.5f,  0.5f,  0.0f, 1.0f,  1.0f, // Top right
-        -0.5f, -0.5f,  0.0f, 0.0f,  0.0f, // Bottom left
-         0.5f, -0.5f,  0.0f, 1.0f,  0.0f  // Bottom right 
+    float vertices[] = {
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
     unsigned int indices[] = {
         0, 1, 3,
         0, 2, 3
+    };
+
+
+    glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
     // Vertex Array Object
@@ -99,7 +176,7 @@ int main (int argc, char *argv[])
     unsigned int VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(attributes), attributes, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -197,14 +274,16 @@ int main (int argc, char *argv[])
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Transformations
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
-    model = glm::translate(model, glm::vec3(0.5f, -0.5f, 0.0f));
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(fieldOfView), (float)c_screenWidth / (float)c_screenHeight, 0.1f, 100.0f);
 
+    // Shader for uniforms
     glUseProgram(shaderProgram);
     glUniform1i(glGetUniformLocation(shaderProgram, "u_texture1"), 0);
     glUniform1i(glGetUniformLocation(shaderProgram, "u_texture2"), 1);
-    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "u_transform"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "u_projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+    glEnable(GL_DEPTH_TEST);
 
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR) {
@@ -213,21 +292,36 @@ int main (int argc, char *argv[])
 
     while (!glfwWindowShouldClose(window))
     {
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        // Process input
+        processInput(window);
 
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(0.5f), glm::vec3(0.0f, 0.0f, 1.0f));
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "u_transform"), 1, GL_FALSE, glm::value_ptr(model));
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
-
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-
         glBindVertexArray(VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        for (unsigned int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float rotation = i * 20.0f;
+            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(rotation), glm::vec3(1.0f, 0.5f, 0.0f));
+            glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "u_model"), 1, GL_FALSE, glm::value_ptr(model));
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, yAxis);
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "u_view"), 1, GL_FALSE, glm::value_ptr(view));
+        projection = glm::perspective(glm::radians(fieldOfView), (float)c_screenWidth / (float)c_screenHeight, 0.1f, 100.0f);
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "u_projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -245,4 +339,86 @@ int main (int argc, char *argv[])
 void updateWindowSize(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, true);
+    }
+
+    float cameraSpeed = 2.5f * deltaTime;
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        cameraPos += cameraSpeed * cameraFront;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        cameraPos -= cameraSpeed * cameraFront;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        cameraPos -= glm::normalize(glm::cross(cameraFront, yAxis))* cameraSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        cameraPos += glm::normalize(glm::cross(cameraFront, yAxis))* cameraSpeed;
+    }
+}
+
+void handleMouseMovement(GLFWwindow* window, double xPos, double yPos)
+{
+    if (!isCursorDisabled)
+    {
+        return;
+    }
+
+    if (firstMouse)
+    {
+        lastX = xPos;
+        lastY = yPos;
+        firstMouse = false;
+    }
+
+    float xOffset = xPos - lastX;
+    float yOffset = lastY - yPos;
+    lastX = xPos;
+    lastY = yPos;
+
+    const float c_sensitivity = 0.1f;
+    xOffset *= c_sensitivity;
+    yOffset *= c_sensitivity;
+
+    yaw += xOffset;
+    pitch += yOffset;
+
+    if (pitch > 89.0f)
+    {
+        pitch = 89.0f;
+    }
+    if (pitch < -89.0f)
+    {
+        pitch = -89.0f;
+    }
+
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(direction);
+}
+
+void handleMouseScroll(GLFWwindow* window, double xOffset, double yOffset)
+{
+    fieldOfView -= (float)yOffset;
+    if (fieldOfView < 1.0f)
+    {
+        fieldOfView = 1.0f;
+    }
+    if (fieldOfView > 45.0f)
+    {
+        fieldOfView = 45.0f;
+    }
 }
