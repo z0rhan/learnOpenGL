@@ -43,6 +43,8 @@ void Shader::unbind() const
     glCall(glUseProgram(0));
 }
 
+//------------------------------------------------------------------------------
+// Uniform setters
 void Shader::setUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
 {
     glCall(glUniform4f(getUniformLocation(name), v0, v1, v2, v3));
@@ -55,7 +57,7 @@ void Shader::setUniform1i(const std::string& name, int value)
 
 void Shader::setUniformMat4f(const std::string& name, const glm::mat4& matrix)
 {
-    glCall(glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &matrix[0][0]));
+    glCall(glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix)));
 }
 
 int Shader::getUniformLocation(const std::string& name)
@@ -78,6 +80,7 @@ int Shader::getUniformLocation(const std::string& name)
 
     return location;
 }
+//------------------------------------------------------------------------------
 
 bool Shader::isValid() const
 {
