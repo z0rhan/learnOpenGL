@@ -12,9 +12,9 @@
 #include <format>
 #include <filesystem>
 
-const std::string c_shaderFilePath = "res/shaders/basic.shader";
-const char* c_texture1FilePath = "res/textures/container.jpg";
-const char* c_texture2FilePath = "res/textures/awesomeface.png";
+const std::string c_shaderFilePath = "res/shaders/gettingStarted/basic.shader";
+const char* c_texture1FilePath = "res/textures/gettingStarted/container.jpg";
+const char* c_texture2FilePath = "res/textures/gettingStarted/awesomeface.png";
 constexpr unsigned int c_screenWidth = 800;
 constexpr unsigned int c_screenHeight = 600;
 
