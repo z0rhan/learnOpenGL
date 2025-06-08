@@ -38,7 +38,7 @@ float lastY = (float)c_screenHeight/ 2;
 bool firstMouse = true;
 
 // Light cube position
-glm::vec3 lightCubePos = glm::vec3(1.2f, 1.0f, 2.0f);
+glm::vec3 lightCubePos = glm::vec3(0.0f, 0.0f, 4.0f);
 
 // Declarations
 void updateWindowSize(GLFWwindow* window, int width, int height);
@@ -85,53 +85,65 @@ int main (int argc, char *argv[])
 
     std::cout << std::format("Wokring dir: {}\n", std::filesystem::current_path().string());
 
-    float vertices[] = {
-        -0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
+    float vertices[] =
+    {
+        // Positions          // Normal vectors
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
 
-        -0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
 
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-        -0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-        -0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
     };
 
     // Shader
     Shader cubeShader(c_cubeShader);
+    if (!cubeShader.isValid())
+    {
+        std::cerr << "Error compiling shader\n";
+    }
+
     Shader lightCubeShader(c_lightCubeShader);
+    if (!lightCubeShader.isValid())
+    {
+        std::cerr << "Error compiling shader\n";
+
+    }
 
     // Vertex Array Object for cube
     unsigned int cubeVAO;
@@ -144,8 +156,10 @@ int main (int argc, char *argv[])
     glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // Vertex Array Object for cube
     unsigned int lightCubeVAO;
@@ -157,7 +171,7 @@ int main (int argc, char *argv[])
     glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
 
     // Still need to specify the layouts
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     while (!glfwWindowShouldClose(window))
@@ -174,26 +188,33 @@ int main (int argc, char *argv[])
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Rotate the light source
+        glm::mat4 rotMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(0.5f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat3 rotY = glm::mat3(rotMatrix);
+        lightCubePos = rotY * lightCubePos;
+
         // Cube model
-        glBindBuffer(GL_VERTEX_ARRAY, cubeVAO);
+        glBindVertexArray(cubeVAO);
         cubeShader.bind();
+        cubeShader.setUniformVec3("u_lightPosition", lightCubePos);
         cubeShader.setUniformVec3("u_objColor", glm::vec3(1.0f, 0.5f, 0.31f));
         cubeShader.setUniformVec3("u_lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+        cubeShader.setUniformVec3("u_viewPosition", camera.position());
         glm::mat4 model = glm::mat4(1.0f);
         cubeShader.setUniformMat4f("u_model", model);
         // Projection
         glm::mat4 projection = glm::perspective(glm::radians(camera.fieldOfView()), (float)c_screenWidth / (float)c_screenHeight, 0.1f, 100.0f);
         cubeShader.setUniformMat4f("u_projection", projection);
         // Camera
-        glm::mat4 view = camera.ViewMat4f();
-        view = camera.ViewMat4f();
+        glm::mat4 view = camera.viewMat4f();
+        view = camera.viewMat4f();
         cubeShader.setUniformMat4f("u_view", view);
 
         // Draw call
         glCall(glDrawArrays(GL_TRIANGLES, 0, 36));
 
         // lightCube model
-        glBindBuffer(GL_VERTEX_ARRAY, lightCubeVAO);
+        glBindVertexArray(lightCubeVAO);
         lightCubeShader.bind();
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightCubePos);

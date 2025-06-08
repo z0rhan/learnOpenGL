@@ -28,13 +28,14 @@ public:
            float frontX, float frontY, float frontZ,
            float upX, float upY, float upZ);
 
-    float fieldOfView() const;
-
-    glm::mat4 ViewMat4f() const;
-
     void processKeyboardInputs(MovementType movement, float& deltaTime);
     void processMouseMovement(float xOffset, float yOffset, const bool constrainPitch);
     void processMouseScroll(float yOffset);
+
+    // Getters
+    float fieldOfView() const;
+    glm::mat4 viewMat4f() const;
+    glm::vec3 position() const;
 
 private:
     glm::vec3 m_cameraPos;

@@ -23,17 +23,25 @@ Camera::Camera(float posX, float posY, float posZ,
     Camera(glm::vec3(posX, posY, posZ), glm::vec3(frontX, frontY, frontZ), glm::vec3(upX, upY, upZ));
 }
 
-
+//------------------------------------------------------------------------------
+// GETTERs
 float Camera::fieldOfView() const
 {
     return m_fieldOfView;
 }
 
-glm::mat4 Camera::ViewMat4f() const
+glm::mat4 Camera::viewMat4f() const
 {
     return glm::lookAt(m_cameraPos, m_cameraPos + m_cameraFront, m_yAxis);
 }
 
+glm::vec3 Camera::position() const
+{
+    return m_cameraPos;
+}
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
 void Camera::processKeyboardInputs(MovementType movement, float& deltaTime)
 {
     float movementSpeed = deltaTime * m_cameraSpeed;
@@ -83,10 +91,10 @@ void Camera::processMouseScroll(float yOffset)
 
     updateCamera();
 }
+//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 // PRIVATE IMPLEMENTATIONS
-
 void Camera::updateCamera()
 {
     glm::vec3 cameraFront;
