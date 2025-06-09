@@ -133,17 +133,7 @@ int main (int argc, char *argv[])
 
     // Shader
     Shader cubeShader(c_cubeShader);
-    if (!cubeShader.isValid())
-    {
-        std::cerr << "Error compiling shader\n";
-    }
-
     Shader lightCubeShader(c_lightCubeShader);
-    if (!lightCubeShader.isValid())
-    {
-        std::cerr << "Error compiling shader\n";
-
-    }
 
     // Vertex Array Object for cube
     unsigned int cubeVAO;
@@ -196,10 +186,21 @@ int main (int argc, char *argv[])
         // Cube model
         glBindVertexArray(cubeVAO);
         cubeShader.bind();
-        cubeShader.setUniformVec3("u_lightPosition", lightCubePos);
-        cubeShader.setUniformVec3("u_objColor", glm::vec3(1.0f, 0.5f, 0.31f));
-        cubeShader.setUniformVec3("u_lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+
+        // Material
+        cubeShader.setUniformVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f)); // set the same as objColor
+        cubeShader.setUniformVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f)); // set the same as objColor
+        cubeShader.setUniformVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+        cubeShader.setUniform1f("material.shininess", 32.0f);
+
+        // Light
+        cubeShader.setUniformVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+        cubeShader.setUniformVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+        cubeShader.setUniformVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        cubeShader.setUniformVec3("light.position", lightCubePos);
         cubeShader.setUniformVec3("u_viewPosition", camera.position());
+
+        // Model
         glm::mat4 model = glm::mat4(1.0f);
         cubeShader.setUniformMat4f("u_model", model);
         // Projection

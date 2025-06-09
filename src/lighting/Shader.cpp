@@ -7,7 +7,6 @@
 #include <iostream>
 #include <stdexcept>
 
-
 //------------------------------------------------------------------------------
 // Public
 Shader::Shader(const std::string& filePath):
@@ -50,6 +49,11 @@ void Shader::setUniform1i(const std::string& name, int value)
     glCall(glUniform1i(getUniformLocation(name), value));
 }
 
+void Shader::setUniform1f(const std::string& name, float value)
+{
+    glCall(glUniform1f(getUniformLocation(name), value));
+}
+
 void Shader::setUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
 {
     glCall(glUniform4f(getUniformLocation(name), v0, v1, v2, v3));
@@ -86,11 +90,6 @@ int Shader::getUniformLocation(const std::string& name)
     return location;
 }
 //------------------------------------------------------------------------------
-
-bool Shader::isValid() const
-{
-    return m_renderedId != 0;
-}
 
 //------------------------------------------------------------------------------
 // Private
@@ -149,6 +148,19 @@ unsigned int Shader::compileShader(unsigned int type, const std::string &source)
     const char* shaderSource = source.c_str();
     glShaderSource(shader, 1, &shaderSource, nullptr);
     glCall(glCompileShader(shader));
+
+    int sucess;
+    char infoLog[512];
+
+    glCall(glGetShaderiv(shader, GL_COMPILE_STATUS,  &sucess));
+    if (!sucess)
+    {
+        glCall(glGetShaderInfoLog(shader, 512, 0,infoLog));
+        std::cerr << "Shader compilation failed:\n";
+        std::cerr << infoLog << std::endl;
+
+        assert(sucess); // assert to make sure shader compilation is success
+    }
 
     return shader;
 }

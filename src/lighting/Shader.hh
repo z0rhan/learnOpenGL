@@ -50,25 +50,31 @@ public:
     Shader(const std::string& filePath);
     ~Shader();
 
+    // Use the shader program
     void bind() const;
+    // Uses 0 as the shader program
     void unbind() const;
 
+    // I trust ur intelligence
     void setUniform4f(const std::string& name, float v0, float v1, float v2, float v3);
     void setUniform1i(const std::string& name, int value);
+    void setUniform1f(const std::string& name, float value);
     void setUniformMat4f(const std::string& name, const glm::mat4& matrix);
     void setUniformVec3(const std::string& name, const glm::vec3& vector);
 
-    bool isValid() const;
-
 private:
-    std::string m_filePath; // For debugging purposes
     unsigned int m_renderedId;
-    std::unordered_map<std::string, int> m_uniformLocationCache;
+    std::string m_filePath; // For debugging purposes
+    std::unordered_map<std::string, int> m_uniformLocationCache; // cache locations
 
+    // reads from source file to get the source for shaders
     static ShaderSource parseShader(const std::string& filePath);    
+    // makes and returns a shader program that has vertex and fragment shader
     static unsigned int createShader(const std::string& vertexSource,
                                      const std::string& fragmentSource);
+    // GL calls for compiling shader
     static unsigned int compileShader(unsigned int type,const std::string& source);
+    // returns the location of an uniform
     int getUniformLocation(const std::string& name);
 };
 
