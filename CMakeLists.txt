@@ -26,8 +26,8 @@ target_include_directories(getting_started PRIVATE
 )
 
 target_link_libraries(getting_started
-        OpenGL::GL
-        ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a
+    OpenGL::GL
+    ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a
 )
 
 # lighting
@@ -40,7 +40,6 @@ set(LIGHTING
     ${CMAKE_SOURCE_DIR}/vendor/glad/src/glad.c
 )
 
-
 add_executable(lighting ${LIGHTING})
 
 target_include_directories(lighting PRIVATE
@@ -49,6 +48,6 @@ target_include_directories(lighting PRIVATE
 )
 
 target_link_libraries(lighting
-        OpenGL::GL
-        ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a
+    OpenGL::GL
+    ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a
 )

@@ -36,6 +36,7 @@ public:
     float fieldOfView() const;
     glm::mat4 viewMat4f() const;
     glm::vec3 position() const;
+    glm::vec3 front() const;
 
 private:
     glm::vec3 m_cameraPos;

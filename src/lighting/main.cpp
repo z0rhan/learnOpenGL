@@ -41,7 +41,7 @@ float lastY = (float)c_screenHeight/ 2;
 bool firstMouse = true;
 
 // Light cube position
-glm::vec3 lightCubePos = glm::vec3(0.0f, 0.0f, 4.0f);
+glm::vec3 lightCubePos = glm::vec3(0.0f, 0.0f, 5.0f);
 
 // Declarations
 void updateWindowSize(GLFWwindow* window, int width, int height);
@@ -134,6 +134,21 @@ int main (int argc, char *argv[])
         -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
+
+    glm::vec3 cubePositions[] =
+    {
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
     // Shader
     Shader cubeShader(c_cubeShader);
     Shader lightCubeShader(c_lightCubeShader);
@@ -214,11 +229,28 @@ int main (int argc, char *argv[])
         cubeShader.setUniformVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
         cubeShader.setUniformVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
         cubeShader.setUniformVec3("light.position", lightCubePos);
+        cubeShader.setUniform1f("light.constant", 1.0f);
+        cubeShader.setUniform1f("light.linear", 0.045f);
+        cubeShader.setUniform1f("light.quadratic", 0.0075f);
+
+        // torch like with spotlight
+        cubeShader.setUniformVec3("torch.position", camera.position());
+        cubeShader.setUniformVec3("torch.direction", camera.front());
+        cubeShader.setUniform1f("torch.cutoff", glm::cos(glm::radians(10.5f)));
+        cubeShader.setUniform1f("torch.outerCutoff", glm::cos(glm::radians(15.5f)));
+
         cubeShader.setUniformVec3("u_viewPosition", camera.position());
 
-        // Model
-        glm::mat4 model = glm::mat4(1.0f);
-        cubeShader.setUniformMat4f("u_model", model);
+        for (unsigned int i = 0; i < 10; i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            cubeShader.setUniformMat4f("u_model", model);
+            glCall(glDrawArrays(GL_TRIANGLES, 0, 36));
+        }
+
         // Projection
         glm::mat4 projection = glm::perspective(glm::radians(camera.fieldOfView()), (float)c_screenWidth / (float)c_screenHeight, 0.1f, 100.0f);
         cubeShader.setUniformMat4f("u_projection", projection);
@@ -227,10 +259,8 @@ int main (int argc, char *argv[])
         view = camera.viewMat4f();
         cubeShader.setUniformMat4f("u_view", view);
 
-        // Draw call
-        glCall(glDrawArrays(GL_TRIANGLES, 0, 36));
-
         // lightCube model
+        glm::mat4 model = glm::mat4(1.0f);
         glBindVertexArray(lightCubeVAO);
         lightCubeShader.bind();
         model = glm::mat4(1.0f);
