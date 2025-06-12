@@ -37,7 +37,18 @@ struct Material
     float shininess;
 };
 
-struct Light
+struct DirLight
+{
+    vec3 direction;
+
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+uniform DirLight dirLight;
+vec3 calculateDirLight(DirLight light, vec3 normal, vec3 viewDir);
+
+struct PointLight
 {
     vec3 position;
 
@@ -49,75 +60,108 @@ struct Light
     float linear;
     float quadratic;
 };
+#define NR_POINT_LIGHTS 4
+uniform PointLight pointLights[NR_POINT_LIGHTS];
+vec3 calculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 struct Torch
 {
     vec3 position;
     vec3 direction;
+
     float cutoff;
     float outerCutoff;
+
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+
+    float constant;
+    float linear;
+    float quadratic;
 };
+uniform Torch torch;
+vec3 calculateSpotlight(Torch light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 uniform vec3 u_viewPosition;
 uniform Material material;
-uniform Light light;
-uniform Torch torch;
 
 void main()
 {
-    // First for the point light
-    vec3 lightDir = normalize(light.position - fragmentPosition);
-    // Ambient lighting
-    vec3 pointAmbient = light.ambient * vec3(texture(material.diffuse, textureCoord));
-
-    // Diffuse lighting
-    vec3 norm = normalize(Normal);
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 pointDiffuse = diff * light.diffuse * vec3(texture(material.diffuse, textureCoord));
-
-    // Specular lighting
+    vec3 normal = normalize(Normal);
     vec3 viewDir = normalize(u_viewPosition - fragmentPosition);
-    vec3 reflectDir = reflect(-lightDir, norm); // lightDir is poiting from obj to light source
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec3 pointSpecular = spec * light.specular * vec3(texture(material.specular, textureCoord));
 
-    // attenuation
-    float distance = length(light.position - fragmentPosition);
+    // Directional lighting
+    vec3 result = calculateDirLight(dirLight, normal, viewDir);
+
+    // Point light
+    for (int i = 0; i < NR_POINT_LIGHTS; i++)
+    {
+        result += calculatePointLight(pointLights[i], normal, fragmentPosition, viewDir);
+    }
+
+    // Spotlight
+    result += calculateSpotlight(torch, normal, fragmentPosition, viewDir);
+
+    FragColor = vec4(result, 1.0);
+}
+
+vec3 calculateDirLight(DirLight light, vec3 normal, vec3 viewDir)
+{
+    vec3 lightDir = normalize(-light.direction);
+    vec3 reflectDir = reflect(-lightDir, normal);
+
+    float diff = max(dot(normal, lightDir), 0.0);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+
+    vec3 ambient = light.ambient * vec3(texture(material.diffuse, textureCoord));
+    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, textureCoord));
+    vec3 specular = light.specular * spec * vec3(texture(material.specular, textureCoord));
+
+    return (ambient + diffuse + specular);
+}
+
+vec3 calculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+{
+    vec3 lightDir = normalize(light.position - fragPos);
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float distance = length(light.position - fragPos);
+
+    float diff = max(dot(lightDir, normal), 0.0);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
-    pointAmbient *= attenuation;
-    pointDiffuse *= attenuation;
-    pointSpecular *= attenuation;
-    vec3 pointResult = pointAmbient + pointDiffuse + pointSpecular;
+    vec3 ambient = light.ambient * vec3(texture(material.diffuse, textureCoord));
+    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, textureCoord));
+    vec3 specular = light.specular * spec * vec3(texture(material.specular, textureCoord));
 
-    // Now for the light spotlight [torch like]
-    vec3 torchDir = normalize(torch.position - fragmentPosition);
-    // Diffuse lighting
-    float torchdiff = max(dot(norm, torchDir), 0.0);
-    vec3 torchdiffuse = torchdiff * light.diffuse * vec3(texture(material.diffuse, textureCoord));
+    ambient *= attenuation;
+    diffuse *= attenuation;
+    specular *= attenuation;
 
-    // Specular lighting
-    vec3 torchreflectDir = reflect(-torchDir, norm); // lightDir is poiting from obj to light source
-    float torchspec = pow(max(dot(viewDir, torchreflectDir), 0.0), material.shininess);
-    vec3 torchSpecular = torchspec * light.specular * vec3(texture(material.specular, textureCoord));
+    return (ambient + diffuse + specular);
+}
 
-    // attenuation
-    float torchdistance = length(torch.position - fragmentPosition);
-    float torchattenuation = 1.0 / (light.constant + light.linear * torchdistance + light.quadratic * (torchdistance * torchdistance));
+vec3 calculateSpotlight(Torch light, vec3 normal, vec3 fragPos, vec3 viewDir)
+{
+    vec3 lightDir = normalize(light.position - fragPos);
+    vec3 reflectDir = reflect(-light.direction, normal);
+    float distance = length(light.position - fragPos);
+    float theta = dot(lightDir, normalize(-light.direction));
+    float epsilon = light.cutoff - light.outerCutoff;
 
-    torchdiffuse *= torchattenuation;
-    torchSpecular *= torchattenuation;
+    float diff = max(dot(lightDir, normal), 0.0);
+    float spec = pow(max(dot(viewDir, lightDir), 0.0), material.shininess);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+    float intensity = clamp((theta - light.outerCutoff) / epsilon, 0.0, 1.0);
 
-    // spotlight
-    float theta = dot(torchDir, normalize(-torch.direction));
-    float epsilon = torch.cutoff - torch.outerCutoff;
-    float intensity = clamp((theta - torch.outerCutoff) / epsilon, 0.0, 1.0);
-    torchdiffuse *= intensity;
-    torchSpecular *= intensity;
+    vec3 ambient = light.ambient * vec3(texture(material.diffuse, textureCoord));
+    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, textureCoord));
+    vec3 specular = light.specular * spec * vec3(texture(material.specular, textureCoord));
 
-    vec3 torchresult = torchdiffuse + torchSpecular;
+    ambient *= attenuation * intensity;
+    diffuse *= attenuation * intensity;
+    specular *= attenuation * intensity;
 
-
-    vec3 resultingColor = pointResult + torchresult;
-    FragColor = vec4(resultingColor, 1.0);
+    return (ambient + diffuse + specular);
 }

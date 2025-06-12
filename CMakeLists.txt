@@ -51,3 +51,25 @@ target_link_libraries(lighting
     OpenGL::GL
     ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a
 )
+
+# model loading
+set(MODEL
+    ${CMAKE_SOURCE_DIR}/src/modelLoading/main.cpp
+    ${CMAKE_SOURCE_DIR}/src/modelLoading/Shader.cpp
+    ${CMAKE_SOURCE_DIR}/src/modelLoading/error.cpp
+    ${CMAKE_SOURCE_DIR}/src/modelLoading/Camera.cpp
+    ${CMAKE_SOURCE_DIR}/vendor/stb_image/stb_image.cpp
+    ${CMAKE_SOURCE_DIR}/vendor/glad/src/glad.c
+)
+
+add_executable(model ${MODEL})
+
+target_include_directories(model PRIVATE
+    ${CMAKE_SOURCE_DIR}/vendor/glad/include
+    ${CMAKE_SOURCE_DIR}/vendor
+)
+
+target_link_libraries(model
+    OpenGL::GL
+    ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a
+)

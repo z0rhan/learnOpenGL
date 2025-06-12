@@ -149,6 +149,13 @@ int main (int argc, char *argv[])
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
+    glm::vec3 pointLightPositions[] =
+    {
+        glm::vec3( 0.7f,  0.2f,  2.0f),
+        glm::vec3( 2.3f, -3.3f, -4.0f),
+        glm::vec3(-4.0f,  2.0f, -12.0f),
+    };
+
     // Shader
     Shader cubeShader(c_cubeShader);
     Shader lightCubeShader(c_lightCubeShader);
@@ -225,19 +232,55 @@ int main (int argc, char *argv[])
         cubeShader.setUniform1f("material.shininess", 32.0f);
 
         // Light
-        cubeShader.setUniformVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-        cubeShader.setUniformVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-        cubeShader.setUniformVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-        cubeShader.setUniformVec3("light.position", lightCubePos);
-        cubeShader.setUniform1f("light.constant", 1.0f);
-        cubeShader.setUniform1f("light.linear", 0.045f);
-        cubeShader.setUniform1f("light.quadratic", 0.0075f);
+        // directional light
+        cubeShader.setUniform3f("dirLight.direction", -0.2f, -1.0f, -0.3f);
+        cubeShader.setUniform3f("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+        cubeShader.setUniform3f("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+        cubeShader.setUniform3f("dirLight.specular", 0.5f, 0.5f, 0.5f);
+        // point light 1
+        cubeShader.setUniformVec3("pointLights[0].position", pointLightPositions[0]);
+        cubeShader.setUniform3f("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+        cubeShader.setUniform3f("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+        cubeShader.setUniform3f("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+        cubeShader.setUniform1f("pointLights[0].constant", 1.0f);
+        cubeShader.setUniform1f("pointLights[0].linear", 0.09f);
+        cubeShader.setUniform1f("pointLights[0].quadratic", 0.032f);
+        // point light 2
+        cubeShader.setUniformVec3("pointLights[1].position", pointLightPositions[1]);
+        cubeShader.setUniform3f("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+        cubeShader.setUniform3f("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+        cubeShader.setUniform3f("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+        cubeShader.setUniform1f("pointLights[1].constant", 1.0f);
+        cubeShader.setUniform1f("pointLights[1].linear", 0.09f);
+        cubeShader.setUniform1f("pointLights[1].quadratic", 0.032f);
+        // point light 3
+        cubeShader.setUniformVec3("pointLights[2].position", pointLightPositions[2]);
+        cubeShader.setUniform3f("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+        cubeShader.setUniform3f("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
+        cubeShader.setUniform3f("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
+        cubeShader.setUniform1f("pointLights[2].constant", 1.0f);
+        cubeShader.setUniform1f("pointLights[2].linear", 0.09f);
+        cubeShader.setUniform1f("pointLights[2].quadratic", 0.032f);
+        // point light 4
+        cubeShader.setUniformVec3("pointLights[3].position", lightCubePos);
+        cubeShader.setUniform3f("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+        cubeShader.setUniform3f("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
+        cubeShader.setUniform3f("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
+        cubeShader.setUniform1f("pointLights[3].constant", 1.0f);
+        cubeShader.setUniform1f("pointLights[3].linear", 0.09f);
+        cubeShader.setUniform1f("pointLights[3].quadratic", 0.032f);
 
         // torch like with spotlight
         cubeShader.setUniformVec3("torch.position", camera.position());
         cubeShader.setUniformVec3("torch.direction", camera.front());
         cubeShader.setUniform1f("torch.cutoff", glm::cos(glm::radians(10.5f)));
         cubeShader.setUniform1f("torch.outerCutoff", glm::cos(glm::radians(15.5f)));
+        cubeShader.setUniform3f("torch.ambient", 0.0f, 0.0f, 0.0f);
+        cubeShader.setUniform3f("torch.diffuse", 1.0f, 1.0f, 1.0f);
+        cubeShader.setUniform3f("torch.specular", 1.0f, 1.0f, 1.0f);
+        cubeShader.setUniform1f("torch.constant", 1.0f);
+        cubeShader.setUniform1f("torch.linear", 0.09f);
+        cubeShader.setUniform1f("torch.quadratic", 0.032f);
 
         cubeShader.setUniformVec3("u_viewPosition", camera.position());
 
