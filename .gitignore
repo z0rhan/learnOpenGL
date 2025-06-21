@@ -10,3 +10,6 @@ compile_commands.json
 
 # Formatter
 .clang-format
+
+# zip files for models
+*.zip
