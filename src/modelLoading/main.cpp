@@ -1,7 +1,9 @@
 #include "error.hh"
 #include "Shader.hh"
 #include "Camera.hh"
+#include "Model.hh"
 
+// vendors
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image/stb_image.h>
@@ -10,12 +12,17 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/trigonometric.hpp>
 #include <stb_image/stb_image.h>
+
+// std
 #include <iostream>
 #include <format>
 #include <filesystem>
 
 constexpr unsigned int c_screenWidth = 800;
 constexpr unsigned int c_screenHeight = 600;
+const char* c_gunModelFilePath = "res/models/m4a1/scene.gltf";
+const char* c_rifleModelFilePath = "res/models/rifle/scene.gltf";
+const std::string c_shaderFilePath = "res/shaders/modelLoading/basic.shader";
 
 // View related
 float pitch = 0.0f;
@@ -85,6 +92,9 @@ int main (int argc, char *argv[])
 
     std::cout << std::format("Wokring dir: {}\n", std::filesystem::current_path().string());
 
+    Shader rifleShader(c_shaderFilePath);
+    Model modelObj2(c_rifleModelFilePath);
+
     while (!glfwWindowShouldClose(window))
     {
         // time between each frame
@@ -96,9 +106,29 @@ int main (int argc, char *argv[])
         processInput(window);
 
         // Render
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Render gun
+        rifleShader.bind();
+        // Model Matrix
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        rifleShader.setUniformMat4f("u_model", model);
+
+        // View Matrix
+        glm::mat4 view = camera.view();
+        rifleShader.setUniformMat4f("u_view", view);
+
+        // Projection Matrix
+        glm::mat4 projection = glm::perspective(glm::radians(camera.fieldOfView()), (float)c_screenWidth/(float)c_screenHeight, 0.1f, 100.f);
+        rifleShader.setUniformMat4f("u_projection", projection);
+
+        // Model obj1
+        modelObj2.draw(rifleShader);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

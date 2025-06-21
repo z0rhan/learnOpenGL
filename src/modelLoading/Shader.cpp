@@ -98,7 +98,7 @@ int Shader::getUniformLocation(const std::string& name)
 
 //------------------------------------------------------------------------------
 // Private
-ShaderSource Shader::parseShader(const std::string& filePath)
+ShaderSource Shader::parseShader(const std::string &filePath)
 {
     ShaderType currentType = ShaderType::NONE;
     std::stringstream shaderSource[2];

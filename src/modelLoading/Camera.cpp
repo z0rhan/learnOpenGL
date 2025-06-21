@@ -30,7 +30,7 @@ float Camera::fieldOfView() const
     return m_fieldOfView;
 }
 
-glm::mat4 Camera::viewMat4f() const
+glm::mat4 Camera::view() const
 {
     return glm::lookAt(m_cameraPos, m_cameraPos + m_cameraFront, m_yAxis);
 }

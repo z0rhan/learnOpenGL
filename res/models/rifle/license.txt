@@ -1,0 +1,11 @@
+Model Information:
+* title:	Jurassic: The Hunted Whitworth Rifle
+* source:	https://sketchfab.com/3d-models/jurassic-the-hunted-whitworth-rifle-f5840007dc1147609f73e0acd400eeeb
+* author:	Barcelo (https://sketchfab.com/Barcelo)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Jurassic: The Hunted Whitworth Rifle" (https://sketchfab.com/3d-models/jurassic-the-hunted-whitworth-rifle-f5840007dc1147609f73e0acd400eeeb) by Barcelo (https://sketchfab.com/Barcelo) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

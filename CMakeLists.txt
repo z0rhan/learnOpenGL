@@ -58,6 +58,8 @@ set(MODEL
     ${CMAKE_SOURCE_DIR}/src/modelLoading/Shader.cpp
     ${CMAKE_SOURCE_DIR}/src/modelLoading/error.cpp
     ${CMAKE_SOURCE_DIR}/src/modelLoading/Camera.cpp
+    ${CMAKE_SOURCE_DIR}/src/modelLoading/Mesh.cpp
+    ${CMAKE_SOURCE_DIR}/src/modelLoading/Model.cpp
     ${CMAKE_SOURCE_DIR}/vendor/stb_image/stb_image.cpp
     ${CMAKE_SOURCE_DIR}/vendor/glad/src/glad.c
 )
@@ -67,9 +69,14 @@ add_executable(model ${MODEL})
 target_include_directories(model PRIVATE
     ${CMAKE_SOURCE_DIR}/vendor/glad/include
     ${CMAKE_SOURCE_DIR}/vendor
+    ${CMAKE_SOURCE_DIR}/vendor/assimp/include
 )
 
 target_link_libraries(model
     OpenGL::GL
     ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a
+    ${CMAKE_SOURCE_DIR}/vendor/assimp/lib/libassimp.a
+    # dependencies for libassimp
+    z
+    minizip
 )

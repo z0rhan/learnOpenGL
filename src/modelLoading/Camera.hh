@@ -34,22 +34,24 @@ public:
 
     // Getters
     float fieldOfView() const;
-    glm::mat4 viewMat4f() const;
+    glm::mat4 view() const;
     glm::vec3 position() const;
     glm::vec3 front() const;
 
 private:
-    glm::vec3 m_cameraPos;
-    glm::vec3 m_cameraFront;
-    glm::vec3 m_yAxis;
-    glm::vec3 m_cameraRight;
-    glm::vec3 m_cameraUp;
+    glm::vec3 m_cameraPos;      // position
+    glm::vec3 m_cameraFront;    // camera points to this direction
+    glm::vec3 m_yAxis;          // y axis of the world
+    glm::vec3 m_cameraRight;    // unit vector that points right of the camera
+    glm::vec3 m_cameraUp;       // unit vector that points upwards of the camera
 
-    float m_pitch;
-    float m_yaw;
-    float m_fieldOfView;
-    float m_cameraSpeed;
-    float m_cameraSensitivity;
 
+    float m_pitch;              // initial pitch angle
+    float m_yaw;                // initial yaw angle
+    float m_fieldOfView;        // as the name says
+    float m_cameraSpeed;        // as teh name says
+    float m_cameraSensitivity;  // as the name says
+
+    // updates the above members on events
     void updateCamera();
 };
