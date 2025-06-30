@@ -17,7 +17,6 @@ set(GETTING_STARTED
     ${CMAKE_SOURCE_DIR}/vendor/glad/src/glad.c
 )
 
-
 add_executable(getting_started ${GETTING_STARTED})
 
 target_include_directories(getting_started PRIVATE
@@ -25,10 +24,18 @@ target_include_directories(getting_started PRIVATE
     ${CMAKE_SOURCE_DIR}/vendor
 )
 
-target_link_libraries(getting_started
-    OpenGL::GL
-    ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a
-)
+# Link libraries conditionally based on the platform
+if(WIN32)
+    target_link_libraries(getting_started
+        OpenGL::GL
+        ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/glfw3.lib   # Use .lib on Windows
+    )
+else()
+    target_link_libraries(getting_started
+        OpenGL::GL
+        ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a     # Use .a on Linux
+    )
+endif()
 
 # lighting
 set(LIGHTING
@@ -47,10 +54,18 @@ target_include_directories(lighting PRIVATE
     ${CMAKE_SOURCE_DIR}/vendor
 )
 
-target_link_libraries(lighting
-    OpenGL::GL
-    ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a
-)
+# Link libraries conditionally based on the platform
+if(WIN32)
+    target_link_libraries(lighting
+        OpenGL::GL
+        ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/glfw3.lib   # Use .lib on Windows
+    )
+else()
+    target_link_libraries(lighting
+        OpenGL::GL
+        ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a     # Use .a on Linux
+    )
+endif()
 
 # model loading
 set(MODEL
@@ -72,11 +87,23 @@ target_include_directories(model PRIVATE
     ${CMAKE_SOURCE_DIR}/vendor/assimp/include
 )
 
-target_link_libraries(model
-    OpenGL::GL
-    ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a
-    ${CMAKE_SOURCE_DIR}/vendor/assimp/lib/libassimp.a
-    # dependencies for libassimp
-    z
-    minizip
-)
+# Link libraries conditionally based on the platform
+if(WIN32)
+    target_link_libraries(model
+        OpenGL::GL
+        ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/glfw3.lib   # Use .lib on Windows
+        ${CMAKE_SOURCE_DIR}/vendor/assimp/lib/assimp-vc143-mtd.lib  # Use .lib on Windows
+        # dependencies for assimp on Windows
+        zlibstatic
+        minizipstatic
+    )
+else()
+    target_link_libraries(model
+        OpenGL::GL
+        ${CMAKE_SOURCE_DIR}/vendor/GLFW/lib/libglfw3.a     # Use .a on Linux
+        ${CMAKE_SOURCE_DIR}/vendor/assimp/lib/libassimp.a    # Use .a on Linux
+        # dependencies for assimp on Linux
+        z
+        minizip
+    )
+endif()

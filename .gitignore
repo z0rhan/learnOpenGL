@@ -13,3 +13,7 @@ compile_commands.json
 
 # zip files for models
 *.zip
+
+# Visual studio
+.vs/
+CMakeFiles

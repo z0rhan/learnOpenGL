@@ -14,10 +14,10 @@
 #include <format>
 #include <filesystem>
 
-const std::string c_cubeShader = "res/shaders/lighting/cube.shader";
-const std::string c_lightCubeShader = "res/shaders/lighting/lightCube.shader";
-const char* c_diffuseMap = "res/textures/lighting/container2.png";
-const char* c_specularMap = "res/textures/lighting/test.png";
+const std::string c_cubeShader = "../../res/shaders/lighting/cube.shader";
+const std::string c_lightCubeShader = "../../res/shaders/lighting/lightCube.shader";
+const char* c_diffuseMap = "../../res/textures/lighting/container2.png";
+const char* c_specularMap = "../../res/textures/lighting/test.png";
 constexpr unsigned int c_screenWidth = 800;
 constexpr unsigned int c_screenHeight = 600;
 
